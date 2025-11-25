@@ -1,9 +1,46 @@
 ```{r}
 library(tidyverse)
-library(palmerpenguins)
 
-penguins %>% 
-  ggplot(aes(x = bill_depth_mm)) +
-  geom_density()
+pulse_nation <- read.csv("https://mac-stat.github.io/data/pulse_of_the_nation_processed.csv")
+
+pulse_nation <- pulse_nation %>% 
+  mutate(approvals = (trump_approval == "Somewhat Approve") | (trump_approval == "Strongly Approve"))
+
+pulse_nation %>% 
+  count(approvals)
+
+trump_model1 <- glm(approvals ~ age + income, data = pulse_nation, family = "binomial")
+summary(trump_model1)
+
+trump_model2 <- glm(approvals ~ income + education, data = pulse_nation, family = "binomial")
+summary(trump_model2)
+
+pulse_nation %>% 
+  mutate(income_bracket = cut(income, breaks = 20)) %>%
+  group_by(income_bracket) %>%
+  summarize(approval_rate = mean(approvals)) %>% 
+  ggplot(aes(x = income_bracket, y = approval_rate)) +
+  geom_point() + 
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1, size = 8))
+      
+
+pulse_nation %>% 
+  mutate(age_bracket = cut(age, breaks = 10)) %>%
+  group_by(age_bracket) %>%
+  summarize(approval_rate = mean(approvals)) %>% 
+  ggplot(aes(x = age_bracket, y = approval_rate)) +
+  geom_point() + 
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1, size = 8))
+
+pulse_nation %>% 
+  ggplot(aes(x = gender, fill = approvals)) +
+  geom_bar(position = "fill")
+
+pulse_nation %>% 
+  ggplot(aes(x = education, fill = approvals)) +
+  geom_bar(position = "fill")
+
+
+
 ```
 
