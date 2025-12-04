@@ -9,11 +9,8 @@ pulse_nation <- pulse_nation %>%
 pulse_nation %>% 
   count(approvals)
 
-trump_model1 <- glm(approvals ~ age + income, data = pulse_nation, family = "binomial")
+trump_model1 <- glm(approvals ~ age + income + gender, data = pulse_nation, family = "binomial")
 summary(trump_model1)
-
-trump_model2 <- glm(approvals ~ income + education, data = pulse_nation, family = "binomial")
-summary(trump_model2)
 
 pulse_nation %>% 
   mutate(income_bracket = cut(income, breaks = 20)) %>%
@@ -42,5 +39,24 @@ pulse_nation %>%
 
 
 
+```
+```{r}
+trump_model2 <- glm(approvals ~ income + age + education + gender, data = pulse_nation, family = "binomial")
+summary(trump_model2)
+```
+```{r}
+anova(trump_model1, trump_model2)
+```
+
+```{r}
+pulse_nation %>% 
+  mutate(.fitted = predict(trump_model2, newdata = ., type = "response")) %>% 
+  ggplot(aes(x = approvals, y = .fitted)) +
+  geom_boxplot()
+
+pulse_nation %>% 
+  mutate(.fitted = predict(trump_model1, newdata = ., type = "response")) %>% 
+  ggplot(aes(x = approvals, y = .fitted)) +
+  geom_boxplot()
 ```
 
